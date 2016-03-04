@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestUrlMount < Test::Unit::TestCase
+class TestUrlMount < Minitest::Test
   should "initialize with a path and options" do
     u = UrlMount.new("/some/path", :some => "options")
     assert_equal u.raw_path, "/some/path"
@@ -71,7 +71,7 @@ class TestUrlMount < Test::Unit::TestCase
       assert_equal [:bar, :baz], u.optional_variables
     end
 
-    should "calculate optional variables when there are some" do
+    should "generate url with optional variables when there are some" do
       u = UrlMount.new("/foo(/:bar(/:baz))")
       assert_equal "/foo/gary", u.url(:bar => "gary")
     end
