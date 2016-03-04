@@ -127,6 +127,12 @@ class UrlMount
         else
           buffer << ')'
         end
+      when /^\*(.*)/
+        if stack.empty?
+          @local_segments << Segment::Splat.new($1, options)
+        else
+          buffer << segment
+        end
       when /^\:(.*)/
         if stack.empty?
           @local_segments << Segment::Variable.new($1, options)
@@ -174,6 +180,14 @@ class UrlMount
       def to_s(opts = {})
         item = opts.delete(name) || @options[name]
         item.respond_to?(:call) ? item.call : item
+      end
+    end
+
+    class Splat < Variable
+      def to_s(opts = {})
+        item = opts.delete(name) || @options[name]
+        item = item.join('/') if item.is_a? Array
+        super({ name => item })
       end
     end
 

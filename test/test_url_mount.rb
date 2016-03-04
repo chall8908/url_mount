@@ -228,4 +228,40 @@ class TestUrlMount < Minitest::Test
       assert_equal "/foo/here_is_my_bar", u.url(env)
     end
   end
+
+  context 'splat variables' do
+    should 'be usable as required variables' do
+      u = UrlMount.new('/foo/*bar')
+      assert_equal [:bar], u.required_variables
+      assert_equal( {:required => [:bar], :optional => []}, u.variables )
+    end
+
+    should 'be usable as optional variables' do
+      u = UrlMount.new('/foo/(*bar)')
+      assert_equal [:bar], u.optional_variables
+      assert_equal( {:required => [], :optional => [:bar]}, u.variables )
+      assert_equal '/foo', u.url
+    end
+
+    should 'respect default values' do
+      u = UrlMount.new('/foo/*bar', bar: 'bar')
+      assert_equal '/foo/bar', u.url
+    end
+
+    should 'accept strings as value' do
+      u = UrlMount.new('/foo/*bar')
+      assert_equal '/foo/homer', u.url(bar: 'homer')
+    end
+
+    should 'accept arrays as value' do
+      u = UrlMount.new('/foo/*bar', bar: %w{bar baz})
+      assert_equal '/foo/bar/baz', u.url
+      assert_equal '/foo/bar/homer', u.url(bar: %w{bar homer})
+    end
+
+    should 'be usable alongside regular variables' do
+      u = UrlMount.new('/foo/:bar/*baz')
+      assert_equal '/foo/new_bar/some/homer', u.url(bar: 'new_bar', baz: %w{some homer})
+    end
+  end
 end
