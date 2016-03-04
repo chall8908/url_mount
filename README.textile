@@ -42,8 +42,12 @@ mount.url(:bar => "something") == "/foo/something"
 mount.url #=> Raises UrlMount::Ungeneratable because a required variable was not found
 mount.required_variables == [:bar]
 
-# UrlMount::Ungeneratable raised when a route cannot be generated without options
-no_mount = UrlMount.new("/foo/:bar") # fails because the mount point cannot be generated with no options
+# Mount Point including splat variables
+mount = UrlMount.new("/foo/*bar")
+mount.url(:bar => ["something", "else"]) == "/foo/something/else"
+mount.url(:bar => 'simple') == "/foo/simple"
+mount.url #=> Raises UrlMount::Ungeneratable because a required variable was not found
+mount.required_variables == [:bar]
 
 # Mount Point including optional variables
 mount = UrlMount.new("/foo/:bar(/:baz)", :bar => "bar")
